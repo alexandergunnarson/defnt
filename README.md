@@ -6,7 +6,7 @@ Extracted from [`quantum`](https://github.com/alexandergunnarson/quantum), but m
 Rationale and Summary
 ---
 
-`clojure.spec` is a great leap forward for Clojure. It is difficult to overappreciate the value that it delivers via the expressive and composable data specifications it supports, and the corresponding generative tests they in turn yield out of the box. But, as ever, there is room for improvement. It is a perfectly defensible design decision for the creators of `clojure.spec` to have decoupled specs from the implementation they specify. However, the position `defnt` takes is that there is much greater value in colocating the spec with the spec'ed. This approach yields the following benefits:
+`clojure.spec` is a great leap forward for Clojure. It is difficult to overstate the value that it delivers via the expressive and composable data specifications it supports, and the corresponding generative tests they in turn yield out of the box. But, as ever, there is room for improvement. It is a perfectly defensible design decision for the creators of `clojure.spec` to have decoupled specs from the implementation they specify. However, the position `defnt` takes is that there is much greater value in colocating the spec with the spec'ed. This approach yields the following benefits:
 
 - It is much more terse than `fdef` + `defn`
 - It is much easier to follow
