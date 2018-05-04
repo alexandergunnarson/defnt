@@ -45,9 +45,11 @@ Deconstructed, the above code defines a function `abcde` with only one overload,
 - `a` must satisfy `pos-int?`
 - `b` must satisfy `(s/and double? #(> % 3))`
 - `(> b a)` must hold true
-  - `|` defines a precondition similarly to `:pre` (but implementationally the precondition becomes part of `fdef` and does not use `:pre` in any way)
+  - `|` defines an overload's precondition similarly to `:pre` (but implementationally the precondition becomes part of `fdef` and does not use `:pre` in any way)
+  - Preconditions are optional
 - The return value from the overload must satisfy `(s/and map? #(= (:a %) a))`
-  - `>` defines a postcondition similarly to `:post` (but like `|`, implementationally the precondition becomes part of `fdef` and does not use `:post` in any way)
+  - `>` defines an overload's postcondition similarly to `:post` (but like `|`, implementationally the precondition becomes part of `fdef` and does not use `:post` in any way)
+  - Postconditions are optional
 
 The above `defns` code generates the following:
 
