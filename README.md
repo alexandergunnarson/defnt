@@ -108,7 +108,7 @@ Note that spec'ing destructurings is also possible. Take the more complex exampl
 which expands to:
 
 ```clojure
-(s/fdef fghijk
+(s/fdef fghij
   :args
     (s/or
       :arity-1 (s/cat :a (qs/with (fn [a] a) number?))
