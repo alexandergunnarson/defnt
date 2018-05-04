@@ -46,6 +46,7 @@ Deconstructed, the above code defines a function `abcde` with only one overload,
 - `(> b a)` must hold true
   - `|` defines a precondition similarly to `:pre` (but implementationally the precondition becomes part of `fdef` and does not use `:pre` in any way)
 - The return value from the overload must satisfy `(s/and map? #(= (:a %) a))`
+  - `>` defines a postcondition similarly to `:post` (but like `|`, implementationally the precondition becomes part of `fdef` and does not use `:post` in any way)
 
 The above `defns` code generates the following:
 
