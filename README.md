@@ -111,9 +111,9 @@ which expands to:
 (s/fdef fghijk
   :args
     (s/or
-      :arity-1 (s/cat :a (s/with (fn [a] a) number?))
-      :arity-2 (s/and (s/cat :a (s/with (fn [a] a) number?)
-                             :b (s/with (fn [b] b) number?))
+      :arity-1 (s/cat :a (qs/with (fn [a] a) number?))
+      :arity-2 (s/and (s/cat :a (qs/with (fn [a] a) number?)
+                             :b (qs/with (fn [b] b) number?))
                       (fn [{a :a b :b}] (> a b)))
       :arity-varargs
         (s/and
