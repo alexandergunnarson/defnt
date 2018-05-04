@@ -19,8 +19,8 @@ At the moment, it has only been tested with Clojure 1.8 and 1.9, but it should b
 Related Works
 ---
 
-[Orchestra](https://github.com/jeaye/orchestra)'s `defn-spec` was developed independently, but surprisingly yields some very similar ideas with respect to `defns` (see below) and even a similar interface for specs on function arguments.
-[Spectrum](https://github.com/arohner/spectrum) was also developed independently, and shares `defnt`'s idea of performing spec conformance checks at compile time (though it aims exclusively for "there-exists" checks via generative testing; `defnt` also provides as many compile-time "for-all" proofs as it can before falling back to compile-time generative testing and/or runtime spec checks).
+- [Orchestra](https://github.com/jeaye/orchestra)'s `defn-spec` was developed independently, but surprisingly yields some very similar ideas with respect to `defns` (see below) and even a similar interface for specs on function arguments.
+- [Spectrum](https://github.com/arohner/spectrum) was also developed independently, and shares `defnt`'s idea of performing spec conformance checks at compile time (though it aims exclusively for "there-exists" checks via generative testing; `defnt` also provides as many compile-time "for-all" proofs as it can before falling back to compile-time generative testing and/or runtime spec checks).
 
 Usage
 ---
