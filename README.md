@@ -11,8 +11,8 @@ Rationale and Summary
 - It is much more terse than `fdef` + `defn`
 - It is much easier to follow
 - It is much easier to debug and maintain
-- It it is much better about encouraging and facilitating the spec'ing of functions
-- Fundamentally, **it provides spec information in context rather than drastically increasing cognitive overhead and code duplication via decontextualization.**.
+- As such, it is much better about encouraging and facilitating the spec'ing of functions
+- Fundamentally, **it provides spec information in context rather than drastically increasing cognitive overhead and code duplication via decontextualization.**
 
 At the moment, it has only been tested with Clojure 1.8 and 1.9, but it should be trivial to test with ClojureScript in a coming release, as there is no platform-specific code.
 
