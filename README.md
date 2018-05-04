@@ -29,7 +29,7 @@ There are two ways of defining typed/spec'ed functions using the code in this re
 
 To take a reasonably simple example:
 
-```
+```clojure
 (require '[quantum.core.defnt :refer [defns]])
 
 (defns abcde 
@@ -49,7 +49,7 @@ Deconstructed, the above code defines a function `abcde` with only one overload,
 
 The above `defns` code generates the following:
 
-```
+```clojure
 (s/fdef abcde
   :args (s/or :arity-2
                 (s/and
@@ -75,7 +75,7 @@ Advanced Usage
 
 Note that spec'ing destructurings is also possible. Take the more complex example below:
 
-```
+```clojure
 (defns fghij "Some documentation" {:whatever-metadata "abc"}
   ([a number? > number?] (inc a))
   ([a number?, b number?
@@ -103,7 +103,7 @@ Note that spec'ing destructurings is also possible. Take the more complex exampl
 
 which expands to:
 
-```
+```clojure
 (s/fdef fghijk
   :args
     (s/or
@@ -114,31 +114,31 @@ which expands to:
       :arity-varargs
         (s/and
           (s/cat
-            :a      (s/with (fn [a] a) string?)
-            :b      (s/with (fn [b] b) boolean?)
+            :a      (qs/with (fn [a] a) string?)
+            :b      (qs/with (fn [b] b) boolean?)
             :c      (s/and
-                      (s/with (fn [c]                                             c)        #(-> % count (= 3)))
-                      (s/with (fn [{:keys [ca]}]                                  ca)       keyword?)
-                      (s/with (fn [{:keys [cb]}]                                  cb)       string?)
-                      (s/with (fn [{cc :cc}]                                      cc)       map?)
-                      (s/with (fn [{{cca :cca} :cc}]                              cca)      map?)
-                      (s/with (fn [{{{:keys [ccaa]} :cca} :cc}]                   ccaa)     keyword?)
-                      (s/with (fn [{{{ccab :ccab} :cca} :cc}]                     ccab)     seq?)
-                      (s/with (fn [{{{[as#] :ccab} :cca} :cc}]                    as#)      some?)
-                      (s/with (fn [{{{[[ccabaa]] :ccab} :cca} :cc}]               ccabaa)   some?)
-                      (s/with (fn [{{{[[_# ccabab]] :ccab} :cca} :cc}]            ccabab)   some?)
-                      (s/with (fn [{{{[[_# {:keys [ccababa]}]] :ccab} :cca} :cc}] ccababa)) some?
-                      (s/with (fn [{{{[_# ccabb] :ccab} :cca} :cc}]               ccabb)    some?))
+                      (qs/with (fn [c]                                             c)        #(-> % count (= 3)))
+                      (qs/with (fn [{:keys [ca]}]                                  ca)       keyword?)
+                      (qs/with (fn [{:keys [cb]}]                                  cb)       string?)
+                      (qs/with (fn [{cc :cc}]                                      cc)       map?)
+                      (qs/with (fn [{{cca :cca} :cc}]                              cca)      map?)
+                      (qs/with (fn [{{{:keys [ccaa]} :cca} :cc}]                   ccaa)     keyword?)
+                      (qs/with (fn [{{{ccab :ccab} :cca} :cc}]                     ccab)     seq?)
+                      (qs/with (fn [{{{[as#] :ccab} :cca} :cc}]                    as#)      some?)
+                      (qs/with (fn [{{{[[ccabaa]] :ccab} :cca} :cc}]               ccabaa)   some?)
+                      (qs/with (fn [{{{[[_# ccabab]] :ccab} :cca} :cc}]            ccabab)   some?)
+                      (qs/with (fn [{{{[[_# {:keys [ccababa]}]] :ccab} :cca} :cc}] ccababa)) some?
+                      (qs/with (fn [{{{[_# ccabb] :ccab} :cca} :cc}]               ccabb)    some?))
             :d      (s/and
-                      (s/with (fn [d]         d)   sequential?)
-                      (s/with (fn [[da]]      da)  double?)
-                      (s/with (fn [[_# & db]] db)) seq?)
-            :arg-4# (s/and
-                      (s/with (fn [as#]  as#) vector?)
-                      (s/with (fn [[ea]] ea)) symbol?)
+                      (qs/with (fn [d]         d)   sequential?)
+                      (qs/with (fn [[da]]      da)  double?)
+                      (qs/with (fn [[_# & db]] db)) seq?)
+            :arg-4# (s/qand
+                      (qs/with (fn [as#]  as#) vector?)
+                      (qs/with (fn [[ea]] ea)) symbol?)
             :f      (s/and
-                      (s/with (fn [f]    f)  seq?)
-                      (s/with (fn [[fa]] fa) string?)))
+                      (qs/with (fn [f]    f)  seq?)
+                      (qs/with (fn [[fa]] fa) string?)))
           (fn [{a :a
                 b :b
                 {:as c
@@ -153,7 +153,7 @@ which expands to:
             (and (> a b) (contains? c a)
                  a b c ca cb cc cca ccaa ccab ccabaa ccabab ccababa ccabb d da db ea f fa))))
    :fn
-     (s/with-gen-spec (fn [{:keys [ret]}] ret)
+     (qs/with-gen-spec (fn [{:keys [ret]}] ret)
        (fn [{[arity-kind# args#] :args}]
          (case arity-kind#
            :arity-1
