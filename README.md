@@ -139,7 +139,7 @@ which expands to:
                       (qs/with (fn [[_# & db]] db)) seq?)
             :arg-4# (s/qand
                       (qs/with (fn [as#]  as#) vector?)
-                      (qs/with (fn [[ea]] ea)) symbol?)
+                      (qs/with (fn [[ea]] ea)  symbol?))
             :f      (s/and
                       (qs/with (fn [f]    f)  seq?)
                       (qs/with (fn [[fa]] fa) string?)))
