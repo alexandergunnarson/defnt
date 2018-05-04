@@ -137,7 +137,7 @@ which expands to:
                       (qs/with (fn [d]         d)  sequential?)
                       (qs/with (fn [[da]]      da) double?)
                       (qs/with (fn [[_# & db]] db) seq?))
-            :arg-4# (s/qand
+            :arg-4# (s/and
                       (qs/with (fn [as#]  as#) vector?)
                       (qs/with (fn [[ea]] ea)  symbol?))
             :f      (s/and
