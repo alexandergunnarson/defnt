@@ -33,7 +33,7 @@ To take a reasonably simple example:
 (require '[quantum.core.defnt :refer [defns]])
 
 (defns abcde 
-  [a pos-int? b (s/and double? #(> % 3)) 
+  [a pos-int?, b (s/and double? #(> % 3)) 
    | (> b a)
    > (s/and map? #(= (:a %) a))]
   {:a a :b (+ b 8)})
