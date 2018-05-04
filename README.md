@@ -37,7 +37,7 @@ To take a reasonably simple example:
   [a pos-int?, b (s/and double? #(> % 3)) 
    | (> b a)
    > (s/and map? #(= (:a %) a))]
-  {:a a :b (+ b 8)})
+  (sorted-map :a a :b (+ b 8)))
 ```
 
 Deconstructed, the above code defines a function `abcde` with only one overload, such that:
@@ -69,7 +69,7 @@ The above `defns` code generates the following:
              (let [{a :a b :b} args#]
                (s/spec (s/and map? #(= (:a %) a))))))))
 
-(defn abcde ([a b] {:a a, :b (+ b 8)}))
+(defn abcde [a b] (sorted-map :a a :b (+ b 8)))
 ```
 
 where `qs/with` and `qs/with-gen-spec` are low-complexity, few-LOC functions in `quantum.untyped.core.spec` that assist in spec auditability and data flow.
