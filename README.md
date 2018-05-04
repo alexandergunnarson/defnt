@@ -26,7 +26,7 @@ Related Works
 Usage
 ---
 
-There are two ways of defining typed/spec'ed functions using the code in this repository: 1) using the `defnt` macro, and 2) using its implementationally simpler but less powerful cousin, the `defns` macro (`defnt` is short for `defn`, `t`yped; `defns` is short for `defn`, `s`pec'ed). For now, since `defnt` is not yet fully implemented and since its interface is identical except for the addition of type/spec dispatch, we will approach only `defns`.
+There are two ways of defining typed/spec'ed functions using the code in this repository: 1) using the `defnt` macro, and 2) using its implementationally simpler but less powerful sibling, the `defns` macro (`defnt` is short for `defn`, `t`yped; `defns` is short for `defn`, `s`pec'ed). For now, since `defnt` is not yet fully implemented and since its interface is identical except for the addition of type/spec dispatch, we will approach only `defns`.
 
 To take a reasonably simple example:
 
