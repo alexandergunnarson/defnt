@@ -1,4 +1,6 @@
-(ns quantum.untyped.core.type.predicates)
+(ns quantum.untyped.core.type.predicates
+  (:refer-clojure :exclude
+    [any? boolean? ident? qualified-keyword? simple-symbol?]))
 
 (defn any?
   "Returns true given any argument."
