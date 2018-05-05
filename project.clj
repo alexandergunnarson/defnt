@@ -10,6 +10,9 @@
   :profiles
     {:dev {:global-vars  {*warn-on-reflection* true
                           *unchecked-math*     :warn-on-boxed}
-           :dependencies [[expound   "0.5.0"]
-                          [orchestra "2017.11.12-1"]]}})
+           :dependencies [[org.clojure/clojure    "1.9.0"]
+                          [expound                "0.6.0"]
+                          [orchestra              "2017.11.12-1"]
+                          [org.clojure/spec.alpha "0.1.143"]
+                          [org.clojure/test.check "0.9.0"]]}})
 
