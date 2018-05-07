@@ -54,14 +54,11 @@
                   (map? x)
             [{:path path :pred 'map? :val x :via via :in in}]
             ;; TODO use reducers?
-            (->> x
-                 (map (fn [[k v]]
-                        (when-let [s (get k->s k)]
+            (->> k->s
+                 (map (fn [[k s]]
+                        (let [v (get x k)]
                           (when-not (s/valid? s v)
-                            (cond->>
-                              (s/explain* s (conj path k) via (conj in k) v)
-                              (not (contains? x k))
-                              (cons {:path path :pred (list `contains? '% k) :val x :via via :in in}))))))
+                            (@#'s/explain-1 (get k->s|form k) s (conj path k) via (conj in k) v)))))
                  (filter some?)
                  (apply concat))))
         (gen* [_ overrides path rmap]

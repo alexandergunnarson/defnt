@@ -263,7 +263,8 @@
                    ~@(when varargs [(:k varargs) `(s/* any?)]))
           kv-spec#
             (us/kv ~(cond-> (->> args (map (fn [{:keys [k spec]}] [k spec])) (into (om)))
-                      varargs (assoc (:k varargs) `(s/spec (s/& (s/* any?) ~(:spec varargs))))))
+                      varargs (assoc (:k varargs)
+                                     `(s/spec (s/& (s/* any?) (s/conformer seq) ~(:spec varargs))))))
           conformer# (s/conformer (fn [x#] (s/unform destructurer# x#)))]
       (s/with-gen (s/and destructurer# kv-spec# conformer# ~seq-spec)
         (fn [] (->> (s/gen kv-spec#) (gen/fmap (fn [x#] (s/conform conformer# x#))))))))))
