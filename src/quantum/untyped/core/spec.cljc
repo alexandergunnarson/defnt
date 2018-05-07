@@ -1,17 +1,91 @@
 (ns quantum.untyped.core.spec
   (:require
+    [clojure.core           :as core]
     [clojure.spec.alpha     :as s]
     [clojure.spec.gen.alpha :as gen]))
 
+;; Implementation and interface modified from the Quantum original
 (defn validate [spec x]
   (let [conformed (s/conform spec x)]
     (if (s/invalid? conformed)
-        (let [ed (merge (assoc (s/explain-data* spec [] [] [] x)
-                          ::s/failure :assertion-failed))]
+        (let [ed (core/merge (assoc (s/explain-data* spec [] [] [] x)
+                               ::s/failure :assertion-failed))]
           (throw (ex-info
                    (str "Spec assertion failed\n" (with-out-str (s/explain-out ed)))
                    ed)))
         conformed)))
+
+(defn ^:internal kv-impl
+  "Based on `s/map-spec-impl`"
+  [k->s #_(s/map-of any? specable?) k->s|form #_(s/map-of any? any?) gen-fn #_(? fn?)]
+  (let [id (java.util.UUID/randomUUID)]
+    (reify
+      s/Specize
+        (specize* [this] this)
+        (specize* [this _] this)
+      s/Spec
+        (conform* [_ x]
+          (reduce
+            (fn [x' [k s]]
+              (let [v  (get x' k)
+                    cv (s/conform s v)]
+                (if (s/invalid? cv)
+                    ::s/invalid
+                    (if (identical? cv v)
+                        x'
+                        ;; TODO we might want to do `assoc?!`, depending
+                        (assoc x' k cv)))))
+            x
+            k->s))
+        (unform* [_ x]
+          (reduce
+            (fn [x' [k s]]
+              (let [cv (get x' k)
+                    v  (s/unform s cv)]
+                (if (identical? cv v)
+                    x'
+                    ;; TODO we might want to do `assoc?!`, depending
+                    (assoc x' k v))))
+            x
+            k->s))
+        (explain* [_ path via in x]
+          (if-not ;; TODO we might want a more generalized `map?` predicate like `t/map?`, depending,
+                  ;; which would affect more code below
+                  (map? x)
+            [{:path path :pred 'map? :val x :via via :in in}]
+            ;; TODO use reducers?
+            (->> x
+                 (map (fn [[k v]]
+                        (when-let [s (get k->s k)]
+                          (when-not (s/valid? s v)
+                            (cond->>
+                              (s/explain* s (conj path k) via (conj in k) v)
+                              (not (contains? x k))
+                              (cons {:path path :pred (list `contains? '% k) :val x :via via :in in}))))))
+                 (filter some?)
+                 (apply concat))))
+        (gen* [_ overrides path rmap]
+          (if gen-fn
+              (gen-fn)
+              (let [rmap (assoc rmap id (inc (core/or (get rmap id) 0)))
+                    gen  (fn [[k s]]
+                           (when-not (@#'s/recur-limit? rmap id path k)
+                             [k (gen/delay (@#'s/gensub s overrides (conj path k) rmap k))]))
+                    gens (->> k->s (map gen) (remove nil?) (into {}))]
+                (gen/bind (gen/choose 0 (count gens))
+                          (fn [n]
+                            (let [args (-> gens seq shuffle)]
+                              (->> args
+                                   (take n)
+                                   (apply concat)
+                                   (apply gen/hash-map))))))))
+        (with-gen* [_ gen-fn'] (kv-impl k->s k->s|form gen-fn'))
+        (describe* [_] `(kv ~k->s|form)))))
+
+#?(:clj
+(defmacro kv
+  "No `contains?` checks are performed."
+  [k->s] `(kv-impl ~(into {} k->s) '~k->s nil)))
 
 ;; NOTE: modified from the Quantum original
 #?(:clj (defmacro with [extract-f spec] `(s/nonconforming (s/and (s/conformer ~extract-f) ~spec))))

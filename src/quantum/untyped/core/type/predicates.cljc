@@ -1,24 +1,39 @@
 (ns quantum.untyped.core.type.predicates
   (:refer-clojure :exclude
-    [any? boolean? ident? qualified-keyword? simple-symbol?]))
+    [any? boolean? ident? qualified-keyword? simple-symbol?])
+  (:require
+    [clojure.core   :as core]
+#?(:clj
+    [clojure.future :as fcore])
+    [quantum.untyped.core.vars
+      :refer [defalias]]))
 
-(defn any?
-  "Returns true given any argument."
-  [x] true)
+;; The reason we use `resolve` and `eval` here is that currently we need to prefer built-in impls
+;; where possible in order to leverage their generators
 
-(defn boolean? [x] #?(:clj  (instance? Boolean x)
-                      :cljs (or (true? x) (false? x))))
+#?(:clj  (eval `(defalias ~(if (resolve `fcore/any?)
+                               `fcore/any?
+                               `core/any?)))
+   :cljs (defalias core/any?))
 
-(defn ident?
-  "Return true if x is a symbol or keyword"
-  [x] (or (keyword? x) (symbol? x)))
+#?(:clj  (eval `(defalias ~(if (resolve `fcore/boolean?)
+                               `fcore/boolean?
+                               `core/boolean?)))
+   :cljs (defalias core/boolean?))
 
-(defn qualified-keyword?
-  "Return true if x is a keyword with a namespace"
-  [x] (boolean (and (keyword? x) (namespace x) true)))
+#?(:clj  (eval `(defalias ~(if (resolve `fcore/ident?)
+                               `fcore/ident?
+                               `core/ident?)))
+   :cljs (defalias core/ident?))
 
-(defn simple-symbol?
-  "Return true if x is a symbol without a namespace"
-  [x] (and (symbol? x) (nil? (namespace x))))
+#?(:clj  (eval `(defalias ~(if (resolve `fcore/qualified-keyword?)
+                               `fcore/qualified-keyword?
+                               `core/qualified-keyword?)))
+   :cljs (defalias core/qualified-keyword?))
+
+#?(:clj  (eval `(defalias ~(if (resolve `fcore/simple-symbol?)
+                               `fcore/simple-symbol?
+                               `core/simple-symbol?)))
+   :cljs (defalias core/simple-symbol?))
 
 (def val? some?)

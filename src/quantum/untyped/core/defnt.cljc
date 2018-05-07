@@ -3,6 +3,7 @@
   (:refer-clojure :exclude [any? ident? qualified-keyword? simple-symbol?])
   (:require
     [clojure.spec.alpha                 :as s]
+    [clojure.spec.gen.alpha             :as gen]
     [quantum.untyped.core.convert       :as uconv]
     [quantum.untyped.core.data.map
       :refer [om]]
@@ -250,6 +251,24 @@
               []
               args+varargs kw-args)))
 
+#?(:clj
+(defmacro seq-destructure
+  [seq-spec #_any? args #_(s/* (s/cat :k keyword? :spec any?)) & [varargs #_(s/? (s/cat :k keyword? :spec any?))]]
+  (let [args    (us/validate (s/* (s/cat :k keyword? :spec any?)) args)
+        varargs (us/validate (s/? (s/cat :k keyword? :spec any?)) varargs)]
+   `(let [destructurer#
+            (s/cat ~@(->> args
+                          (map (fn [{:keys [k spec]}] [k `(s/? any?)]))
+                          (apply concat))
+                   ~@(when varargs [(:k varargs) `(s/* any?)]))
+          kv-spec#
+            (us/kv ~(cond-> (->> args (map (fn [{:keys [k spec]}] [k spec])) (into (om)))
+                      varargs (assoc (:k varargs) `(s/spec (s/& (s/* any?) ~(:spec varargs))))))
+          conformer# (s/conformer (fn [x#] (s/unform destructurer# x#)))]
+      (s/with-gen (s/and destructurer# kv-spec# conformer# ~seq-spec)
+        (fn [] (->> (s/gen kv-spec#) (gen/fmap (fn [x#] (s/conform conformer# x#))))))))))
+
+;; TODO handle duplicate bindings (e.g. `_`) by `s/cat` using unique keys — e.g. :b|arg-2
 (defn fns|code [kind lang args]
   (assert (= lang #?(:clj :clj :cljs :cljs)) lang)
   (when (= kind :fn) (println "WARNING: `fn` will ignore spec validation"))
