@@ -252,25 +252,43 @@
               args+varargs kw-args)))
 
 (defn >seq-destructuring-spec
-  "Creates a spec that performs seq destructuring, and provides a generator for such."
-  [positional-destructurer most-complex-positional-destructurer kv-spec or|conformer seq-spec]
+  "Creates a spec that performs seq destructuring, and provides a default generator for such based
+   on the generators of the destructured args."
+  [positional-destructurer most-complex-positional-destructurer kv-spec or|conformer seq-spec
+   generate-from-seq-spec?]
   (let [or|unformer (s/conformer second)
         most-complex-positional-destructurer|unformer
-          (s/conformer (fn [x] (s/unform most-complex-positional-destructurer x)))
-        positional-destructurer|unformer
-          (s/conformer (fn [x] (s/unform positional-destructurer x)))]
+          (s/conformer (fn [x] (s/unform most-complex-positional-destructurer x)))]
     (s/with-gen
-      (s/and positional-destructurer or|unformer kv-spec or|conformer
-             positional-destructurer|unformer seq-spec)
-      #(->> (s/gen kv-spec)
-            (gen/fmap (fn [x] (s/conform most-complex-positional-destructurer|unformer x)))))))
+      (s/and seq-spec
+             (s/conformer (fn [xs] {:xs xs :xs|destructured xs}))
+             (us/kv {:xs|destructured (s/and positional-destructurer
+                                             or|unformer
+                                             kv-spec)})
+             (s/conformer (fn [m] (assoc m :xs|positionally-destructured|ct
+                                           (when-not (-> m :xs|destructured (contains? :varargs))
+                                             (-> m :xs|destructured count)))))
+             (us/kv {:xs|destructured
+                      (s/and or|conformer
+                             (s/conformer (fn [x] (s/unform positional-destructurer x))))})
+             (s/conformer (fn [{:keys [xs xs|destructured xs|positionally-destructured|ct]}]
+                            (if xs|positionally-destructured|ct
+                                (concat xs|destructured (drop xs|positionally-destructured|ct xs))
+                                xs|destructured))))
+      (if generate-from-seq-spec?
+          #(s/gen seq-spec)
+          #(->> (s/gen kv-spec)
+                (gen/fmap (fn [x] (s/conform most-complex-positional-destructurer|unformer x))))))))
 
 #?(:clj
 (defmacro seq-destructure
+  "If `generate-from-seq-spec?` is true, generates from `seq-spec`'s generator instead of the
+   default generation strategy based on the generators of the destructured args."
   [seq-spec #_any? args #_(s/* (s/cat :k keyword? :spec any?))
-   & [varargs #_(s/? (s/cat :k keyword? :spec any?))]]
+   & [varargs #_(s/nilable (s/cat :k keyword? :spec any?))
+      generate-from-seq-spec? #_(s/nilable boolean?)]]
   (let [args    (us/validate (s/* (s/cat :k keyword? :spec any?)) args)
-        varargs (us/validate (s/? (s/cat :k keyword? :spec any?)) varargs)
+        varargs (us/validate (s/nilable (s/cat :k keyword? :spec any?)) varargs)
         args-ct>args-kw #(keyword (str "args-" %))
         arity>cat (fn [arg-i]
                    `(s/cat ~@(->> args (take arg-i)
@@ -294,15 +312,20 @@
                              varargs (concat [[(:k varargs) (:spec varargs)]])))))
           or|conformer#
             (s/conformer
-              (fn or|conformer# [x#]
-                [(case (count x#)
+              (fn or|conformer# [m#]
+                [(case (count m#)
                     ~@(->> (range (inc (count args)))
                            (map (juxt identity args-ct>args-kw))
                            (apply concat))
                     ~@(when varargs [:varargs]))
-                 x#]))]
-      (>destructuring-spec positional-destructurer# ~most-complex-positional-destructurer-sym
-        kv-spec# or|conformer# ~seq-spec)))))
+                 m#]))]
+      (>seq-destructuring-spec positional-destructurer# ~most-complex-positional-destructurer-sym
+        kv-spec# or|conformer# ~seq-spec ~generate-from-seq-spec?)))))
+
+#?(:clj
+(defmacro map-destructure [map-spec #_any? kv-specs #_(s/map-of any? any?)]
+  `(let [kv-spec# (us/kv ~kv-specs)]
+     (s/with-gen (s/and ~map-spec kv-spec#) (fn [] (s/gen kv-spec#))))))
 
 ;; TODO handle duplicate bindings (e.g. `_`) by `s/cat` using unique keys — e.g. :b|arg-2
 (defn fns|code [kind lang args]
