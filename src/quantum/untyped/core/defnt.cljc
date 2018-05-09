@@ -251,23 +251,58 @@
               []
               args+varargs kw-args)))
 
+(defn >seq-destructuring-spec
+  "Creates a spec that performs seq destructuring, and provides a generator for such."
+  [positional-destructurer most-complex-positional-destructurer kv-spec or|conformer seq-spec]
+  (let [or|unformer (s/conformer second)
+        most-complex-positional-destructurer|unformer
+          (s/conformer (fn [x] (s/unform most-complex-positional-destructurer x)))
+        positional-destructurer|unformer
+          (s/conformer (fn [x] (s/unform positional-destructurer x)))]
+    (s/with-gen
+      (s/and positional-destructurer or|unformer kv-spec or|conformer
+             positional-destructurer|unformer seq-spec)
+      #(->> (s/gen kv-spec)
+            (gen/fmap (fn [x] (s/conform most-complex-positional-destructurer|unformer x)))))))
+
 #?(:clj
 (defmacro seq-destructure
-  [seq-spec #_any? args #_(s/* (s/cat :k keyword? :spec any?)) & [varargs #_(s/? (s/cat :k keyword? :spec any?))]]
+  [seq-spec #_any? args #_(s/* (s/cat :k keyword? :spec any?))
+   & [varargs #_(s/? (s/cat :k keyword? :spec any?))]]
   (let [args    (us/validate (s/* (s/cat :k keyword? :spec any?)) args)
-        varargs (us/validate (s/? (s/cat :k keyword? :spec any?)) varargs)]
-   `(let [destructurer#
+        varargs (us/validate (s/? (s/cat :k keyword? :spec any?)) varargs)
+        args-ct>args-kw #(keyword (str "args-" %))
+        arity>cat (fn [arg-i]
+                   `(s/cat ~@(->> args (take arg-i)
+                                       (map (fn [{:keys [k spec]}] [k `any?]))
+                                       (apply concat))))
+        most-complex-positional-destructurer-sym (gensym "most-complex-positional-destructurer")]
+   `(let [~most-complex-positional-destructurer-sym
             (s/cat ~@(->> args
-                          (map (fn [{:keys [k spec]}] [k `(s/? any?)]))
+                          (map (fn [{:keys [k]}] [k `any?]))
                           (apply concat))
-                   ~@(when varargs [(:k varargs) `(s/* any?)]))
+                   ~@(when varargs [(:k varargs) `(s/& (s/+ any?) (s/conformer seq identity))]))
+          positional-destructurer#
+            (s/or :args-0 (s/cat)
+                  ~@(->> (range (count args))
+                         (map (fn [i] [(args-ct>args-kw (inc i)) (arity>cat (inc i))]))
+                         (apply concat))
+                  ~@(when varargs [:varargs most-complex-positional-destructurer-sym]))
           kv-spec#
-            (us/kv ~(cond-> (->> args (map (fn [{:keys [k spec]}] [k spec])) (into (om)))
-                      varargs (assoc (:k varargs)
-                                     `(s/spec (s/& (s/* any?) (s/conformer seq) ~(:spec varargs))))))
-          conformer# (s/conformer (fn [x#] (s/unform destructurer# x#)))]
-      (s/with-gen (s/and destructurer# kv-spec# conformer# ~seq-spec)
-        (fn [] (->> (s/gen kv-spec#) (gen/fmap (fn [x#] (s/conform conformer# x#))))))))))
+            (us/kv (om ~@(apply concat
+                           (cond-> (->> args (map (fn [{:keys [k spec]}] [k spec])))
+                             varargs (concat [[(:k varargs) (:spec varargs)]])))))
+          or|conformer#
+            (s/conformer
+              (fn or|conformer# [x#]
+                [(case (count x#)
+                    ~@(->> (range (inc (count args)))
+                           (map (juxt identity args-ct>args-kw))
+                           (apply concat))
+                    ~@(when varargs [:varargs]))
+                 x#]))]
+      (>destructuring-spec positional-destructurer# ~most-complex-positional-destructurer-sym
+        kv-spec# or|conformer# ~seq-spec)))))
 
 ;; TODO handle duplicate bindings (e.g. `_`) by `s/cat` using unique keys — e.g. :b|arg-2
 (defn fns|code [kind lang args]
