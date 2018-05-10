@@ -87,7 +87,6 @@
           (with-gen* [_ gen-fn'] (kv k->s gen-fn'))
           (describe* [_] `(kv ~k->s|desc))))))
 
-;; NOTE: modified from the Quantum original
 (defn with-gen-spec-impl
   "Do not call this directly; use 'with-gen-spec'."
   [extract-f extract-f|form gen-spec gen-spec|form]
@@ -124,4 +123,3 @@
      {:a 1 :b 1})"
   [extract-f gen-spec]
   `(with-gen-spec-impl ~extract-f '~extract-f ~gen-spec '~gen-spec)))
-
