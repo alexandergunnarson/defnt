@@ -1,4 +1,7 @@
 # `defnt`
+
+[![CircleCI](https://circleci.com/gh/alexandergunnarson/defnt/tree/master.svg?style=svg)](https://circleci.com/gh/alexandergunnarson/defnt/tree/master)
+
 Where `defn` meets [`clojure.spec`](https://clojure.org/about/spec) and a gradual-typing baby is born.
 
 Extracted from [`quantum`](https://github.com/alexandergunnarson/quantum), but maintained in this separate repository until `quantum` reaches a stable state.
