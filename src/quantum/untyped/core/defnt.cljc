@@ -162,11 +162,11 @@
   "Creates a spec that performs seq destructuring, and provides a default generator for such based
    on the generators of the destructured args."
   [positional-destructurer most-complex-positional-destructurer kv-spec or|conformer seq-spec
-   generate-from-seq-spec?]
+   {:as opts generate-from-seq-spec? :gen?}]
   (let [or|unformer (s/conformer second)
         most-complex-positional-destructurer|unformer
           (s/conformer (fn [x] (s/unform most-complex-positional-destructurer x)))]
-    (s/with-gen
+    (cond->
       (s/and seq-spec
              (s/conformer (fn [xs] {:xs xs :xs|destructured xs}))
              (us/kv {:xs|destructured (s/and positional-destructurer
@@ -182,19 +182,19 @@
                             (if xs|positionally-destructured|ct
                                 (concat xs|destructured (drop xs|positionally-destructured|ct xs))
                                 xs|destructured))))
-      (if generate-from-seq-spec?
-          #(s/gen seq-spec)
-          #(->> (s/gen kv-spec)
-                (gen/fmap (fn [x] (s/conform most-complex-positional-destructurer|unformer x))))))))
+      (not generate-from-seq-spec?)
+      (s/with-gen
+        #(->> (s/gen kv-spec)
+              (gen/fmap (fn [x] (s/conform most-complex-positional-destructurer|unformer x))))))))
 
 #?(:clj
 (defmacro seq-destructure
   "If `generate-from-seq-spec?` is true, generates from `seq-spec`'s generator instead of the
    default generation strategy based on the generators of the destructured args."
   [seq-spec #_any? args #_(s/* (s/cat :k keyword? :spec any?))
-   & [varargs #_(s/nilable (s/cat :k keyword? :spec any?))
-      generate-from-seq-spec? #_(s/nilable boolean?)]]
-  (let [args    (us/validate (s/* (s/cat :k keyword? :spec any?)) args)
+   & [varargs #_(s/nilable (s/cat :k keyword? :spec any?))]]
+  (let [opts    (meta seq-spec)
+        args    (us/validate (s/* (s/cat :k keyword? :spec any?)) args)
         varargs (us/validate (s/nilable (s/cat :k keyword? :spec any?)) varargs)
         args-ct>args-kw #(keyword (str "args-" %))
         arity>cat (fn [arg-i]
@@ -227,12 +227,16 @@
                     ~@(when varargs [:varargs]))
                  m#]))]
       (>seq-destructuring-spec positional-destructurer# ~most-complex-positional-destructurer-sym
-        kv-spec# or|conformer# ~seq-spec ~generate-from-seq-spec?)))))
+        kv-spec# or|conformer# ~seq-spec ~opts)))))
 
 #?(:clj
 (defmacro map-destructure [map-spec #_any? kv-specs #_(s/map-of any? any?)]
-  `(let [kv-spec# (us/kv ~kv-specs)]
-     (s/with-gen (s/and ~map-spec kv-spec#) (fn [] (s/gen kv-spec#))))))
+  (let [kv-spec-sym (gensym "kv-spec")
+        {:as opts generate-from-map-spec? :gen?} (meta map-spec)]
+    `(let [~kv-spec-sym (us/kv ~kv-specs)]
+       ~(if generate-from-map-spec?
+            `(s/and ~map-spec ~kv-spec-sym)
+            `(s/with-gen (s/and ~map-spec ~kv-spec-sym) (fn [] (s/gen ~kv-spec-sym))))))))
 
 (defn speced-binding>binding [{[kind binding-] :binding-form} #_:quantum.core.defnt/speced-binding]
   (case kind
