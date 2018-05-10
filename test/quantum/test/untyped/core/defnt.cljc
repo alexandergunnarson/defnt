@@ -1,4 +1,6 @@
 (ns quantum.test.untyped.core.defnt
+  (:refer-clojure :exclude
+    [boolean? double? pos-int?])
   (:require
     [clojure.spec.alpha         :as s]
     [clojure.spec.gen.alpha     :as gen]
@@ -8,7 +10,9 @@
     [quantum.untyped.core.defnt :as this]
     [quantum.untyped.core.spec  :as us]
     [quantum.untyped.core.test
-      :refer [defspec-test]]))
+      :refer [defspec-test]]
+    [quantum.untyped.core.type.predicates
+      :refer [boolean? double? pos-int?]]))
 
 ;; Implicit compilation tests
 (this/defns fghijk "Documentation" {:metadata "abc"}

@@ -1,6 +1,6 @@
 (ns quantum.untyped.core.type.predicates
   (:refer-clojure :exclude
-    [any? boolean? ident? qualified-keyword? simple-symbol?])
+    [any? boolean? double? ident? pos-int? qualified-keyword? simple-symbol?])
   (:require
     [clojure.core   :as core]
 #?(:clj
@@ -21,10 +21,20 @@
                                `core/boolean?)))
    :cljs (defalias core/boolean?))
 
+#?(:clj  (eval `(defalias ~(if (resolve `fcore/double?)
+                               `fcore/double?
+                               `core/double?)))
+   :cljs (defalias core/double?))
+
 #?(:clj  (eval `(defalias ~(if (resolve `fcore/ident?)
                                `fcore/ident?
                                `core/ident?)))
    :cljs (defalias core/ident?))
+
+#?(:clj  (eval `(defalias ~(if (resolve `fcore/pos-int?)
+                               `fcore/pos-int?
+                               `core/pos-int?)))
+   :cljs (defalias core/pos-int?))
 
 #?(:clj  (eval `(defalias ~(if (resolve `fcore/qualified-keyword?)
                                `fcore/qualified-keyword?
