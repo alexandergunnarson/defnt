@@ -130,7 +130,7 @@
            (s/cat
              :quantum.core.specs/fn|name   (s/? :quantum.core.specs/fn|name)
              :quantum.core.specs/docstring (s/? :quantum.core.specs/docstring)
-             :quantum.core.specs/meta      (s/? :quantum.core.specs/meta)
+             :pre-meta                     (s/? :quantum.core.specs/meta)
              :output-spec                  :quantum.core.defnt/output-spec
              :overloads                    :quantum.core.defnt/overloads))
          :quantum.core.specs/fn|postchecks
@@ -143,7 +143,7 @@
            (s/cat
              :quantum.core.specs/fn|name   :quantum.core.specs/fn|name
              :quantum.core.specs/docstring (s/? :quantum.core.specs/docstring)
-             :quantum.core.specs/meta      (s/? :quantum.core.specs/meta)
+             :pre-meta                     (s/? :quantum.core.specs/meta)
              :output-spec                  :quantum.core.defnt/output-spec
              :overloads                    :quantum.core.defnt/overloads))
          :quantum.core.specs/fn|postchecks
