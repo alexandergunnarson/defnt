@@ -80,7 +80,7 @@ Advanced Usage
 Note that spec'ing destructurings is also possible. Take the more complex example below:
 
 ```clojure
-(defns abcde "Documentation" {:metadata "fhgjik"}
+(defns abcde "Documentation" {:whatever-metadata "fhjik"}
   ([a number? > number?] (inc a))
   ([a pos-int?, b pos-int?
     | (> a b)
@@ -171,7 +171,7 @@ which expands to:
                     
 (defn abcde
   "Documentation"
-  {:whatever-metadata "abc"}
+  {:whatever-metadata "fhjik"}
   ([a] (inc a))
   ([a b] (+ a b))
   ([a b
