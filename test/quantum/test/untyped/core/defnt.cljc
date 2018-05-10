@@ -2,10 +2,15 @@
   (:require
     [clojure.spec.alpha         :as s]
     [clojure.spec.gen.alpha     :as gen]
+    [clojure.spec.test.alpha    :as stest]
+    [clojure.test.check.clojure-test
+      :refer [defspec]]
     [quantum.untyped.core.defnt :as this]
-    [quantum.untyped.core.spec  :as us]))
+    [quantum.untyped.core.spec  :as us]
+    [quantum.untyped.core.test
+      :refer [defspec-test]]))
 
-;; Implicit compilation test
+;; Implicit compilation tests
 (this/defns fghijk "Documentation" {:metadata "abc"}
   ([a number? > number?] (inc a))
   ([a pos-int?, b pos-int?
@@ -30,7 +35,17 @@
            a b c ca cb cc cca ccaa ccab ccabaa ccabab ccababa ccabb ccabc d da db ea f fa)
     > number?] 0))
 
+(this/defns basic [a number? > number?] (rand))
 
+(defspec-test basic-test `basic)
+
+(this/defns equality [a number? > #(= % a)] a)
+
+(defspec-test equality-test `equality)
+
+(this/defns pre-post [a number? | (> a 3) > #(> % 4)] (inc a))
+
+(defspec-test pre-post-test `pre-post)
 
 ;; TODO assert that the below 2 things are equivalent
 
