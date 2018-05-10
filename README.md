@@ -188,6 +188,32 @@ which expands to:
    0))
 ```
 
+### Map destructuring:
+- In order to not have the following:
+  `(defns abc [{:keys [a a-conformer, b b-conformer] :as c} c-conformer] ...)`
+  where `a` is conformed, `b` is conformed, and `c` is conformed separately such that `(not= a (first c))`:
+  - `c` is conformed first, then from it is destructured `a` and `b`
+  - `a` and `b` are conformed
+  - `a` and `b` are respectively associated into `c` if their conformed values are non-identical
+    - For now we will only support destructuring of objects satisfying `core/map?`
+  - `c` is intentionally not re-conformed
+- All destructuring-keys are considered optional, but each of their values must conform to its spec.
+  There is no support for required keys yet; this is currently handled at the map level.
+- Destructuring-keys may be any arbitrary object, not just keywords, symbols, or strings.
+
+### Seq destructuring
+- In order to not have the following:
+  `(defns abc [[a a-conformer, b b-conformer :as c] c-conformer] ...)`
+  where `a` is conformed, `b` is conformed, and `c` is conformed separately such that `(not= a (first c))`:
+  - `c` is conformed first, then from it is destructured `a` and `b`
+  - `a` and `b` are conformed
+  - `a` and `b` are respectively `concat`'ed onto the rest of `c` (a later optimization will be that
+    this is done only if their conformed values are non-identical). Thus `c` will always end up
+    being a seq.
+    - We support destructuring of any object satisfying `core/seqable?`
+  - `c` is intentionally not re-conformed
+- All destructuring-arguments are considered optional, but each argument must conform to its spec.
+
 Copyright and License
 ---
 *Copyright © 2018 Alex Gunnarson*
