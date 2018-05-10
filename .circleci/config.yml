@@ -20,4 +20,4 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "project.clj" }}
-      - run: lein with-profile clj-1.8 test && lein with-profile clj-1.9 test
+      - run: lein with-profile clj-1-8 test && lein with-profile clj-1-9 test
