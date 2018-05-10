@@ -88,20 +88,19 @@
           (describe* [_] `(kv ~k->s|desc))))))
 
 ;; NOTE: modified from the Quantum original
-#?(:clj (defmacro with [extract-f spec] `(s/nonconforming (s/and (s/conformer ~extract-f) ~spec))))
-
-;; NOTE: modified from the Quantum original
 (defn with-gen-spec-impl
   "Do not call this directly; use 'with-gen-spec'."
   [extract-f extract-f|form gen-spec gen-spec|form]
   (if (fn? gen-spec)
       (let [form      `(with-gen-spec ~extract-f|form ~gen-spec|form)
-            gen-spec' (fn [x] (let [spec (gen-spec x)
-                                    desc (s/describe spec)
-                                    desc (if (= desc ::s/unknown)
-                                             (list 'some-generated-spec gen-spec|form)
-                                             desc)]
-                                (with extract-f (@#'s/spec-impl desc spec nil nil))))]
+            gen-spec' (fn [x]
+                        (let [spec (gen-spec x)
+                              desc (s/describe spec)
+                              desc (if (= desc ::s/unknown)
+                                       (list 'some-generated-spec gen-spec|form)
+                                       desc)]
+                          (s/nonconforming (s/and (s/conformer extract-f)
+                                                  (@#'s/spec-impl desc spec nil nil)))))]
         (reify
           s/Specize
             (s/specize*  [this] this)
