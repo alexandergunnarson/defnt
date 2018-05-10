@@ -37,15 +37,24 @@
 
 (this/defns basic [a number? > number?] (rand))
 
-(defspec-test basic-test `basic)
+(defspec-test test|basic `basic)
 
 (this/defns equality [a number? > #(= % a)] a)
 
-(defspec-test equality-test `equality)
+(defspec-test test|equality `equality)
 
 (this/defns pre-post [a number? | (> a 3) > #(> % 4)] (inc a))
 
-(defspec-test pre-post-test `pre-post)
+(defspec-test test|pre-post `pre-post)
+
+(this/defns gen|seq|0 [[a number? b number? :as b] ^:gen? (s/tuple double? double?)])
+
+(defspec-test test|gen|seq|0 `gen|seq|0)
+
+(this/defns gen|seq|1
+  [[a number? b number? :as b] ^:gen? (s/nonconforming (s/cat :a double? :b double?))])
+
+(defspec-test test|gen|seq|1 `gen|seq|1)
 
 ;; TODO assert that the below 2 things are equivalent
 
