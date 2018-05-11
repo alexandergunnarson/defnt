@@ -1,6 +1,6 @@
 (ns quantum.untyped.core.defnt
   "Primarily for `(de)fns`."
-  (:refer-clojure :exclude [any? ident? qualified-keyword? simple-symbol?])
+  (:refer-clojure :exclude [any? ident? qualified-keyword? seqable? simple-symbol?])
   (:require
     [clojure.spec.alpha                 :as s]
     [clojure.spec.gen.alpha             :as gen]
@@ -14,7 +14,7 @@
     [quantum.untyped.core.spec          :as us]
     [quantum.untyped.core.specs]
     [quantum.untyped.core.type.predicates
-      :refer [any? ident? qualified-keyword? simple-symbol?]]))
+      :refer [any? ident? qualified-keyword? seqable? simple-symbol?]]))
 
 ;; ===== Specs ===== ;;
 
@@ -269,7 +269,7 @@
 
 (defn- speced-binding|seq>spec
   [{:as speced-binding [kind binding-] :binding-form [spec-kind spec] :spec}]
-  `(seq-destructure ~spec
+  `(seq-destructure ~(if (= spec-kind :spec) spec `seqable?)
     ~(->> binding- :elems
           (map-indexed
             (fn [i|arg arg|speced-binding]
@@ -291,7 +291,7 @@
 
 (defn- speced-binding|map>spec
   [{:as speced-binding [kind binding-] :binding-form [spec-kind spec] :spec}]
-  `(map-destructure ~spec
+  `(map-destructure ~(if (= spec-kind :spec) spec `map?)
     ~(->> (dissoc binding- :as :or)
           (map (fn [[k v]]
                  (case k

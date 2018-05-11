@@ -15,7 +15,7 @@
       :refer [boolean? double? pos-int?]]))
 
 ;; Implicit compilation tests
-(this/defns fghijk "Documentation" {:metadata "abc"}
+(this/defns abcde "Documentation" {:metadata "abc"}
   ([a number? > number?] (inc a))
   ([a pos-int?, b pos-int?
     | (> a b)
@@ -39,30 +39,35 @@
            a b c ca cb cc cca ccaa ccab ccabaa ccabab ccababa ccabb ccabc d da db ea f fa)
     > number?] 0))
 
-(this/defns basic [a number? > number?] (rand))
+#?(:clj
+(defmacro defns-test [sym & args]
+  `(do (this/defns ~sym ~@args)
+       (defspec-test ~(symbol (str "test|" sym)) (symbol (str (ns-name *ns*)) ~(str sym))))))
 
-(defspec-test test|basic `basic)
+(defns-test basic [a number? > number?] (rand))
 
-(this/defns equality [a number? > #(= % a)] a)
+(defns-test equality [a number? > #(= % a)] a)
 
-(defspec-test test|equality `equality)
+(defns-test pre-post [a number? | (> a 3) > #(> % 4)] (inc a))
 
-(this/defns pre-post [a number? | (> a 3) > #(> % 4)] (inc a))
+(defns-test gen|seq|0 [[a number? b number? :as b] ^:gen? (s/tuple double? double?)])
 
-(defspec-test test|pre-post `pre-post)
-
-(this/defns gen|seq|0 [[a number? b number? :as b] ^:gen? (s/tuple double? double?)])
-
-(defspec-test test|gen|seq|0 `gen|seq|0)
-
-(this/defns gen|seq|1
+(defns-test gen|seq|1
   [[a number? b number? :as b] ^:gen? (s/nonconforming (s/cat :a double? :b double?))])
 
-(defspec-test test|gen|seq|1 `gen|seq|1)
+(defns-test underscore-binding [a number? _ string?] a)
+
+(defns-test underscore-spec|sym [a _ b string?] a)
+
+(defns-test underscore-spec|seq [[a string?] _ b string?] a)
+
+(defns-test underscore-spec|map [{:keys [a string?]} _ b string?] a)
+
+(defns-test underscore-binding+spec [a _ _ #{""} > #{""}] _)
 
 ;; TODO assert that the below 2 things are equivalent
 
-#_(this/defns fghijk "Documentation" {:metadata "abc"}
+#_(this/defns abcde "Documentation" {:metadata "fhgjik"}
   ([a number? > number?] (inc a))
   ([a pos-int?, b pos-int?
     | (> a b)
@@ -86,7 +91,7 @@
            a b c ca cb cc cca ccaa ccab ccabaa ccabab ccababa ccabb ccabc d da db ea f fa)
     > number?] 0))
 
-#_(s/fdef fghijk
+#_(s/fdef abcde
   :args
     (s/or
       :arity-1 (s/cat :a number?)
@@ -147,7 +152,7 @@
                     [ea] :arg-4#
                     [fa :as f] :f} args#] (s/spec number?))))))
 
-#_(defn fghijk "Documentation" {:metadata "abc"}
+#_(defn abcde "Documentation" {:metadata "abc"}
   ([a] (inc a))
   ([a b] (+ a b))
   ([a b
