@@ -128,16 +128,18 @@ which expands to:
                       {:ca keyword?
                        :cb string?
                        :cc (defnt/map-destructure map?
-                             {:cca (defnt/map-destructure map?
-                                     {:ccaa keyword?
-                                      :ccab (defnt/seq-destructure seq?
-                                              [:arg-0 (defnt/seq-destructure some?
-                                                        [:ccabaa some?
-                                                         :ccabab (defnt/map-destructure some? {:ccababa some?})])
-                                               :ccabb some?]
-                                              [:ccabc some?])})})})
+                             {:cca 
+                               (defnt/map-destructure map?
+                                 {:ccaa keyword?
+                                  :ccab 
+                                    (defnt/seq-destructure seq?
+                                      [:arg-0 (defnt/seq-destructure some?
+                                                [:ccabaa some?
+                                                 :ccabab (defnt/map-destructure some? {:ccababa some?})])
+                                       :ccabb some?]
+                                      [:ccabc some?])})})})
             :d      (defnt/seq-destructure sequential? [:da double?] [:db seq?])
-            :arg-4# (defnt/seq-destructure ^{:gen? true} (s/coll-of symbol? :kind vector?) [:ea symbol?] )
+            :arg-4# (defnt/seq-destructure ^{:gen? true} (s/coll-of symbol? :kind vector?) [:ea symbol?])
             :f      (defnt/seq-destructure seq? [:fa #{"a" "b" "c"}]))
           (fn [{a :a
                 b :b
