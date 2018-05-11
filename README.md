@@ -1,6 +1,7 @@
 # `defnt`
 
 [![CircleCI](https://circleci.com/gh/alexandergunnarson/defnt/tree/master.svg?style=svg)](https://circleci.com/gh/alexandergunnarson/defnt/tree/master)
+[![Clojars Project](https://img.shields.io/clojars/v/quantum/defnt.svg)](https://clojars.org/quantum/defnt)
 
 Where `defn` meets [`clojure.spec`](https://clojure.org/about/spec) and a gradual-typing baby is born.
 
