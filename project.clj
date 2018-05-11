@@ -96,7 +96,7 @@
 ;; E.g. LEIN_COMMAND="deploy-all" lein
 (when-let [command (System/getenv "LEIN_COMMAND")]
   (case command
-    "deploy-all" (do #_(deploy! :clj-1.8.0)
+    "deploy-all" (do (deploy! :clj-1.8.0)
                      (deploy! :clj-1.9.0)
                      (deploy! :current))
     (throw (ex-info "Unhandled command" {:command command}))))
