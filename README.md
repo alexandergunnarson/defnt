@@ -76,7 +76,7 @@ The above `defns` code generates the following:
 (defn abc [a b] (sorted-map :a a :b (+ b 8)))
 ```
 
-where `qs/with` and `qs/with-gen-spec` are low-complexity, few-LOC functions in `quantum.untyped.core.spec` that assist in spec auditability and data flow.
+where `us/with-gen-spec` is a low-complexity, few-LOC macro in `quantum.untyped.core.spec` that assists in spec auditability and data flow.
 
 Advanced Usage
 ---
