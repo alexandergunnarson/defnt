@@ -17,7 +17,7 @@
    [org.clojure/test.check "0.9.0"]])
 
 (def project-name 'quantum/defnt)
-(def version "0.2.0")
+(def version "0.2.1")
 
 (defn >base-profile [profile-ident #_keyword?]
   (let [relativized-version
