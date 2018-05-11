@@ -15,7 +15,7 @@
       :refer [boolean? double? pos-int?]]))
 
 ;; Implicit compilation tests
-(this/defns fghijk "Documentation" {:metadata "abc"}
+(this/defns abcde "Documentation" {:metadata "abc"}
   ([a number? > number?] (inc a))
   ([a pos-int?, b pos-int?
     | (> a b)
@@ -62,7 +62,7 @@
 
 ;; TODO assert that the below 2 things are equivalent
 
-#_(this/defns fghijk "Documentation" {:metadata "abc"}
+#_(this/defns abcde "Documentation" {:metadata "fhgjik"}
   ([a number? > number?] (inc a))
   ([a pos-int?, b pos-int?
     | (> a b)
@@ -86,7 +86,7 @@
            a b c ca cb cc cca ccaa ccab ccabaa ccabab ccababa ccabb ccabc d da db ea f fa)
     > number?] 0))
 
-#_(s/fdef fghijk
+#_(s/fdef abcde
   :args
     (s/or
       :arity-1 (s/cat :a number?)
@@ -147,7 +147,7 @@
                     [ea] :arg-4#
                     [fa :as f] :f} args#] (s/spec number?))))))
 
-#_(defn fghijk "Documentation" {:metadata "abc"}
+#_(defn abcde "Documentation" {:metadata "abc"}
   ([a] (inc a))
   ([a b] (+ a b))
   ([a b
