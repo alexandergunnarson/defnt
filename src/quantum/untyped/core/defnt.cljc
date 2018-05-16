@@ -19,7 +19,7 @@
 ;; ===== Specs ===== ;;
 
 (s/def :quantum.core.defnt/local-name
-  (s/and simple-symbol? (complement #{'& '| '> '?})))
+  (s/and simple-symbol? (complement #{'& '| '>})))
 
 (s/def :quantum.core.defnt/spec
   (s/alt :any   #{'_}
