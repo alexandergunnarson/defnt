@@ -7,8 +7,7 @@
     [quantum.untyped.core.type.predicates
       :refer [ident?]]))
 
-;; Implementation and interface modified from the Quantum original
-(defn validate [spec x]
+(defn assert-conform [spec x]
   (let [conformed (s/conform spec x)]
     (if (s/invalid? conformed)
         (let [ed (core/merge (assoc (s/explain-data* spec [] [] [] x)
