@@ -35,7 +35,7 @@ There are two ways of defining typed/spec'ed functions using the code in this re
 To take a reasonably simple example:
 
 ```clojure
-(require '[quantum.core.defnt :refer [defns]])
+(require '[quantum.untyped.core.defnt :refer [defns]])
 
 (defns abc 
   [a pos-int?, b (s/and double? #(> % 3)) 
