@@ -1,3 +1,7 @@
+## *Note: Superseded by [gradual](https://github.com/alexandergunnarson/gradual).*
+
+Bindings are straightforward to change. No API changes have been made, just location: `quantum.untyped.core.defnt/defns` -> `gradual.spec/defn`.
+
 # `defnt`
 
 [![CircleCI](https://circleci.com/gh/alexandergunnarson/defnt/tree/master.svg?style=svg)](https://circleci.com/gh/alexandergunnarson/defnt/tree/master)
